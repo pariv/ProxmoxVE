@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source <(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/build.func)
+source <(curl -fsSL https://raw.githubusercontent.com/pariv/ProxmoxVE/immich/misc/build.func)
 # Copyright (c) 2024 chmistry
 # License: MIT | https://github.com/immich-app/immich
 
