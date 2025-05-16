@@ -1,30 +1,20 @@
 #!/usr/bin/env bash
 
-echo "=== IMMICH: STEP 0 (start script) ==="
 # Copyright (c) 2024 chmistry
 # License: MIT
 # Source: https://github.com/immich-app/immich
 
 source /dev/stdin <<<"$FUNCTIONS_FILE_PATH"
-echo "=== IMMICH: STEP 1 (imported functions) ==="
 color
-echo "=== IMMICH: STEP 2 (color) ==="
 verb_ip6
-echo "=== IMMICH: STEP 3 (verb_ip6) ==="
 catch_errors
-echo "=== IMMICH: STEP 4 (catch_errors) ==="
 setting_up_container
-echo "=== IMMICH: STEP 5 (setting_up_container) ==="
 network_check
-echo "=== IMMICH: STEP 6 (network_check) ==="
 update_os
-echo "=== IMMICH: STEP 7 (update_os) ==="
 
-# set -euo pipefail
-echo "=== IMMICH: STEP 8 (set -euo pipefail) ==="
+set -euo pipefail
 
 # === Переменные ===
-echo "=== IMMICH: STEP 9 (variables) ==="
 IMMICH_USER="immich"
 IMMICH_DIR="/home/$IMMICH_USER"
 UPLOAD_DIR="$IMMICH_DIR/upload"
@@ -61,7 +51,7 @@ fi
 
 # === Установка системных зависимостей ===
 msg_info "Установка базовых зависимостей..."
-$STD apt install -y curl git python3-venv python3-dev build-essential unzip postgresql-common gnupg software-properties-common jq cmake autoconf pkg-config meson ninja-build libbrotli-dev libde265-dev libexif-dev libexpat1-dev libglib2.0-dev libgsf-1-dev libjpeg62-turbo-dev liblcms2-2 librsvg2-dev libspng-dev zlib1g cpanminus wget libdav1d-dev libhwy-dev libwebp-dev libio-compress-brotli-perl libtool automake libtool-bin libssl-dev libpng-dev libtiff-dev libxml2-dev liborc-0.4-0 liborc-0.4-dev
+$STD apt install -y curl git python3-venv python3-dev build-essential unzip postgresql-common gnupg software-properties-common jq cmake autoconf pkg-config meson ninja-build libbrotli-dev libde265-dev libexif-dev libexpat1-dev libglib2.0-dev libgsf-1-dev libjpeg-turbo8-dev liblcms2-2 librsvg2-dev libspng-dev zlib1g cpanminus wget libdav1d-dev libhwy-dev libwebp-dev libio-compress-brotli-perl libtool automake libtool-bin libssl-dev libpng-dev libtiff-dev libxml2-dev liborc-0.4-0 liborc-0.4-dev
 msg_ok "Базовые зависимости установлены"
 
 # === Установка PostgreSQL с pgvector ===
