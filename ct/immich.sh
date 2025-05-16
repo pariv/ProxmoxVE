@@ -32,7 +32,7 @@ function update_script() {
 
 # --- Запрос опции ускорения ML ---
 if ML_ACCEL=$(whiptail --backtitle "Proxmox VE Helper Scripts" --title "Machine Learning Acceleration" --radiolist \
-  "Выберите поддержку ML-ускорения для Immich:" 12 60 3 \
+  "Выберите поддержку ML-ускорения для Immich!:" 12 60 3 \
   "cpu" "Только CPU (без ускорения)" ON \
   "cuda" "NVIDIA CUDA (GPU)" OFF \
   "openvino" "Intel OpenVINO (iGPU/dGPU/NPU)" OFF \
