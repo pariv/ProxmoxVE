@@ -94,7 +94,7 @@ if [ "$OS" = "ubuntu" ]; then
     export DPKG_ARCHITECTURE="$( dpkg --print-architecture )"
     cat <<EOF | tee /etc/apt/sources.list.d/jellyfin.sources > /dev/null
 Types: deb
-URIs: https://repo.jellyfin.org/[0m${VERSION_OS}
+URIs: https://repo.jellyfin.org/${VERSION_OS}
 Suites: ${VERSION_CODENAME}
 Components: main
 Architectures: ${DPKG_ARCHITECTURE}
