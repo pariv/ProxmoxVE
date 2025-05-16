@@ -175,8 +175,14 @@ LIBHEIF_REVISION=$(jq -cr '.revision' $BASE_IMG_REPO_DIR/server/sources/libheif.
 $STD git clone https://github.com/strukturag/libheif.git $SOURCE_DIR/libheif
 cd $SOURCE_DIR/libheif
 $STD git reset --hard "$LIBHEIF_REVISION"
+
+# Определяем версию libjpeg-turbo и преобразуем в формат XYYZZZZ
+LIBJPEG_TURBO_VERSION=$(dpkg-query -W -f='${Version}' libjpeg-turbo8-dev | grep -oE '^[0-9]+\\.[0-9]+\\.[0-9]+')
+IFS='.' read -r MAJOR MINOR PATCH <<< "$LIBJPEG_TURBO_VERSION"
+LIBJPEG_TURBO_VERSION_NUMBER=$((10#$MAJOR * 1000000 + 10#$MINOR * 10000 + 10#$PATCH))
+
 $STD rm -rf build && $STD mkdir build && cd build
-$STD cmake --preset=release-noplugins -DWITH_DAV1D=ON -DENABLE_PARALLEL_TILE_DECODING=ON -DWITH_LIBSHARPYUV=ON -DWITH_LIBDE265=ON -DWITH_AOM_DECODER=OFF -DWITH_AOM_ENCODER=OFF -DWITH_X265=OFF -DWITH_EXAMPLES=OFF ..
+$STD cmake --preset=release-noplugins -DWITH_DAV1D=ON -DENABLE_PARALLEL_TILE_DECODING=ON -DWITH_LIBSHARPYUV=ON -DWITH_LIBDE265=ON -DWITH_AOM_DECODER=OFF -DWITH_AOM_ENCODER=OFF -DWITH_X265=OFF -DWITH_EXAMPLES=OFF -DCMAKE_CXX_FLAGS="-DLIBJPEG_TURBO_VERSION_NUMBER=$LIBJPEG_TURBO_VERSION_NUMBER" ..
 $STD make install -j "$(nproc)"
 $STD ldconfig /usr/local/lib
 
