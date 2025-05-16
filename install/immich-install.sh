@@ -1,20 +1,30 @@
 #!/usr/bin/env bash
 
+echo "=== IMMICH: STEP 0 (start script) ==="
 # Copyright (c) 2024 chmistry
 # License: MIT
 # Source: https://github.com/immich-app/immich
 
 source /dev/stdin <<<"$FUNCTIONS_FILE_PATH"
+echo "=== IMMICH: STEP 1 (imported functions) ==="
 color
+echo "=== IMMICH: STEP 2 (color) ==="
 verb_ip6
+echo "=== IMMICH: STEP 3 (verb_ip6) ==="
 catch_errors
+echo "=== IMMICH: STEP 4 (catch_errors) ==="
 setting_up_container
+echo "=== IMMICH: STEP 5 (setting_up_container) ==="
 network_check
+echo "=== IMMICH: STEP 6 (network_check) ==="
 update_os
+echo "=== IMMICH: STEP 7 (update_os) ==="
 
-set -euo pipefail
+# set -euo pipefail
+echo "=== IMMICH: STEP 8 (set -euo pipefail) ==="
 
 # === Переменные ===
+echo "=== IMMICH: STEP 9 (variables) ==="
 IMMICH_USER="immich"
 IMMICH_DIR="/home/$IMMICH_USER"
 UPLOAD_DIR="$IMMICH_DIR/upload"
