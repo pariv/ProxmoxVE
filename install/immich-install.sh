@@ -142,6 +142,17 @@ msg_ok "Репозиторий Immich клонирован"
 # === Сборка и установка библиотек (libjxl, libheif, libraw, imagemagick, libvips) ===
 msg_info "Сборка библиотек для Immich..."
 BASE_IMG_REPO_DIR="/root/base-images" # путь к base-images, скорректируйте если нужно
+BASE_IMAGES_COMMIT="db6bbc0c73dba2ca5a31f0d942b35025d5eab9c2"  # фиксированный коммит для стабильности
+
+# Клонируем base-images, если его нет
+if [ ! -d "$BASE_IMG_REPO_DIR" ]; then
+    git clone https://github.com/immich-app/base-images.git "$BASE_IMG_REPO_DIR"
+fi
+cd "$BASE_IMG_REPO_DIR"
+git fetch --all
+git checkout "$BASE_IMAGES_COMMIT"
+cd -
+
 SOURCE_DIR="/root/image-source"
 $STD mkdir -p "$SOURCE_DIR"
 
