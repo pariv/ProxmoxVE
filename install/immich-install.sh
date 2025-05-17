@@ -284,45 +284,27 @@ fi
 msg_info "Установка Immich и зависимостей..."
 cd $INSTALL_DIR_src
 
+$STD su - $IMMICH_USER -c "mkdir -p $INSTALL_DIR_app $INSTALL_DIR_ml $INSTALL_DIR_geo" 
 # npm (web, server, sdk)
 $STD su - $IMMICH_USER -c "INSTALL_DIR_src='$INSTALL_DIR_src'; export NVM_DIR=\"\$HOME/.nvm\"; [ -s \"\$NVM_DIR/nvm.sh\" ] && . \"\$NVM_DIR/nvm.sh\"; nvm use 22; cd \"\$INSTALL_DIR_src/server\" && npm ci && npm run build && npm prune --omit=dev --omit=optional"
 $STD su - $IMMICH_USER -c "INSTALL_DIR_src='$INSTALL_DIR_src'; export NVM_DIR=\"\$HOME/.nvm\"; [ -s \"\$NVM_DIR/nvm.sh\" ] && . \"\$NVM_DIR/nvm.sh\"; nvm use 22; cd \"\$INSTALL_DIR_src/open-api/typescript-sdk\" && npm ci && npm run build"
 $STD su - $IMMICH_USER -c "INSTALL_DIR_src='$INSTALL_DIR_src'; export NVM_DIR=\"\$HOME/.nvm\"; [ -s \"\$NVM_DIR/nvm.sh\" ] && . \"\$NVM_DIR/nvm.sh\"; nvm use 22; cd \"\$INSTALL_DIR_src/web\" && npm ci && npm run build"
 
 # Копирование артефактов
-$STD cp -a $INSTALL_DIR_src/server/node_modules $INSTALL_DIR_src/server/dist $INSTALL_DIR_src/server/bin $INSTALL_DIR_app/
-$STD cp -a $INSTALL_DIR_src/web/build $INSTALL_DIR_app/www
-$STD cp -a $INSTALL_DIR_src/server/resources $INSTALL_DIR_src/server/package.json $INSTALL_DIR_src/server/package-lock.json $INSTALL_DIR_app/
-$STD cp -a $INSTALL_DIR_src/server/start*.sh $INSTALL_DIR_app/
-$STD cp -a $INSTALL_DIR_src/LICENSE $INSTALL_DIR_app/
+$STD su - $IMMICH_USER -c "cp -a $INSTALL_DIR_src/server/node_modules $INSTALL_DIR_src/server/dist $INSTALL_DIR_src/server/bin $INSTALL_DIR_app/"
+$STD su - $IMMICH_USER -c "cp -a $INSTALL_DIR_src/web/build $INSTALL_DIR_app/www"
+$STD su - $IMMICH_USER -c "cp -a $INSTALL_DIR_src/server/resources $INSTALL_DIR_src/server/package.json $INSTALL_DIR_src/server/package-lock.json $INSTALL_DIR_app/"
+$STD su - $IMMICH_USER -c "cp -a $INSTALL_DIR_src/server/start*.sh $INSTALL_DIR_app/"
+$STD su - $IMMICH_USER -c "cp -a $INSTALL_DIR_src/LICENSE $INSTALL_DIR_app/"
 
 # Python ML
-cd $INSTALL_DIR_src/machine-learning
-$STD python3 -m venv $INSTALL_DIR_ml/venv
-. $INSTALL_DIR_ml/venv/bin/activate
-$STD pip3 install poetry
-if [[ "$ML_ACCEL" == "cuda" ]]; then
-  $STD poetry install --no-root --with dev --with cuda
-elif [[ "$ML_ACCEL" == "openvino" ]]; then
-  $STD poetry install --no-root --with dev --with openvino
-else
-  $STD poetry install --no-root --with dev --with cpu
-fi
-$STD pip install "numpy<2"
+$STD su - $IMMICH_USER -c "cd $INSTALL_DIR_src/machine-learning && python3 -m venv $INSTALL_DIR_ml/venv && . $INSTALL_DIR_ml/venv/bin/activate && pip3 install poetry && poetry install --no-root --with dev --with ${ML_ACCEL} && pip install 'numpy<2'"
 
 # Копирование ML
-$STD cp -a $INSTALL_DIR_src/machine-learning/ann $INSTALL_DIR_src/machine-learning/start.sh $INSTALL_DIR_src/machine-learning/app $INSTALL_DIR_ml/
+$STD su - $IMMICH_USER -c "cp -a $INSTALL_DIR_src/machine-learning/ann $INSTALL_DIR_src/machine-learning/start.sh $INSTALL_DIR_src/machine-learning/app $INSTALL_DIR_ml/"
 
 # Geodata
-$STD mkdir -p $INSTALL_DIR_geo
-cd $INSTALL_DIR_geo
-$STD wget -q https://download.geonames.org/export/dump/admin1CodesASCII.txt
-$STD wget -q https://download.geonames.org/export/dump/admin2Codes.txt
-$STD wget -q https://download.geonames.org/export/dump/cities500.zip
-$STD wget -q https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_10m_admin_0_countries.geojson
-$STD unzip -o cities500.zip
-$STD rm cities500.zip
-$STD ln -s $INSTALL_DIR_geo $INSTALL_DIR_app/geodata
+$STD su - $IMMICH_USER -c "cd $INSTALL_DIR_geo && wget -q https://download.geonames.org/export/dump/admin1CodesASCII.txt && wget -q https://download.geonames.org/export/dump/admin2Codes.txt && wget -q https://download.geonames.org/export/dump/cities500.zip && wget -q https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_10m_admin_0_countries.geojson && unzip -o cities500.zip && rm cities500.zip && ln -s $INSTALL_DIR_geo $INSTALL_DIR_app/geodata"
 
 msg_ok "Immich установлен"
 
