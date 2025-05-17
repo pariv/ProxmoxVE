@@ -75,7 +75,7 @@ msg_ok "Репозитории настроены"
 # === Установка системных зависимостей ===
 msg_info "Установка базовых зависимостей..."
 $STD apt install --no-install-recommends -yqq \
-  autoconf automake build-essential cmake jq libbrotli-dev libde265-dev libexif-dev \
+  autoconf automake libtool libtool-bin build-essential cmake jq libbrotli-dev libde265-dev libexif-dev \
   libexpat1-dev libglib2.0-dev libgsf-1-dev libjpeg62-turbo-dev liblcms2-2 \
   librsvg2-dev libspng-dev meson ninja-build pkg-config wget zlib1g cpanminus \
   libdav1d-dev libhwy-dev libwebp-dev \
