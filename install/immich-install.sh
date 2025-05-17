@@ -285,9 +285,9 @@ msg_info "Установка Immich и зависимостей..."
 cd $INSTALL_DIR_src
 
 # npm (web, server, sdk)
-$STD su - $IMMICH_USER -c "cd $INSTALL_DIR_src/server && npm ci && npm run build && npm prune --omit=dev --omit=optional"
-$STD su - $IMMICH_USER -c "cd $INSTALL_DIR_src/open-api/typescript-sdk && npm ci && npm run build"
-$STD su - $IMMICH_USER -c "cd $INSTALL_DIR_src/web && npm ci && npm run build"
+$STD su - $IMMICH_USER -c 'export NVM_DIR="$HOME/.nvm"; [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"; nvm use 22; cd $INSTALL_DIR_src/server && npm ci && npm run build && npm prune --omit=dev --omit=optional'
+$STD su - $IMMICH_USER -c 'export NVM_DIR="$HOME/.nvm"; [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"; nvm use 22; cd $INSTALL_DIR_src/open-api/typescript-sdk && npm ci && npm run build'
+$STD su - $IMMICH_USER -c 'export NVM_DIR="$HOME/.nvm"; [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"; nvm use 22; cd $INSTALL_DIR_src/web && npm ci && npm run build'
 
 # Копирование артефактов
 $STD cp -a $INSTALL_DIR_src/server/node_modules $INSTALL_DIR_src/server/dist $INSTALL_DIR_src/server/bin $INSTALL_DIR_app/
@@ -382,4 +382,12 @@ customize
 msg_info "Cleaning up"
 $STD apt-get -y autoremove
 $STD apt-get -y autoclean
+
+# Удаляем исходники библиотек
+$STD rm -rf /root/image-source
+# Удаляем base-images
+$STD rm -rf /root/base-images
+# (Опционально) Удаляем исходники Immich, если не нужны для обновлений
+# $STD rm -rf $INSTALL_DIR_src
+
 msg_ok "Cleaned" 
