@@ -49,22 +49,58 @@ else
     msg_error "Неподдерживаемая ОС: $OS"
 fi
 
+# === Настройка репозиториев для совместимости с base-images ===
+set -e
+
+msg_info "Настройка репозиториев для совместимости с base-images..."
+
+# Расширяем репозитории
+$STD sed -i -e 's/ main/ main contrib non-free non-free-firmware/g' /etc/apt/sources.list
+if ! grep -q 'bookworm-updates' /etc/apt/sources.list; then
+  echo 'deb http://deb.debian.org/debian bookworm-updates main contrib non-free non-free-firmware testing sid' >> /etc/apt/sources.list
+fi
+
+# Устанавливаем Pin-Priority для testing и unstable
+cat > /etc/apt/preferences.d/immich-base-images << EOL
+Package: *
+Pin: release a=unstable
+Pin-Priority: 450
+
+Package: *
+Pin: release a=testing
+Pin-Priority: 450
+EOL
+
+# Добавляем репозиторий PostgreSQL
+$STD install -d /usr/share/postgresql-common/pgdg
+$STD curl -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc --fail https://www.postgresql.org/media/keys/ACCC4CF8.asc
+echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt bookworm-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+
+$STD apt update
+msg_ok "Репозитории настроены"
+
 # === Установка системных зависимостей ===
 msg_info "Установка базовых зависимостей..."
-$STD apt install -y curl git python3-venv python3-dev build-essential unzip postgresql-common gnupg software-properties-common jq cmake autoconf pkg-config meson ninja-build libbrotli-dev libde265-dev libexif-dev libexpat1-dev libglib2.0-dev libgsf-1-dev libjpeg62-turbo-dev liblcms2-2 librsvg2-dev libspng-dev zlib1g cpanminus wget libdav1d-dev libhwy-dev libwebp-dev libio-compress-brotli-perl libtool automake libtool-bin libssl-dev libpng-dev libtiff-dev libxml2-dev liborc-0.4-0 liborc-0.4-dev
+$STD apt install --no-install-recommends -yqq \
+  autoconf build-essential cmake jq libbrotli-dev libde265-dev libexif-dev \
+  libexpat1-dev libglib2.0-dev libgsf-1-dev libjpeg62-turbo-dev liblcms2-2 \
+  librsvg2-dev libspng-dev meson ninja-build pkg-config wget zlib1g cpanminus \
+  libdav1d-dev libhwy-dev libwebp-dev libio-compress-brotli-perl \
+  curl git python3-venv python3-dev unzip gnupg software-properties-common
 msg_ok "Базовые зависимости установлены"
 
-# === Установка PostgreSQL с pgvector ===
-msg_info "Установка PostgreSQL с расширением pgvecto.rs..."
-$STD /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+# === Установка PostgreSQL с pgvector и pgvecto.rs ===
+msg_info "Установка PostgreSQL и расширения pgvector..."
 $STD apt install -y postgresql-17 postgresql-17-pgvector
+msg_ok "PostgreSQL установлен"
 
+msg_info "Установка pgvecto.rs..."
 deb=$(basename https://github.com/tensorchord/pgvecto.rs/releases/download/v0.4.0/vectors-pg17_0.4.0_amd64.deb) && \
 $STD curl -LO "https://github.com/tensorchord/pgvecto.rs/releases/download/v0.4.0/$deb" && \
 $STD dpkg -i "$deb" && \
 $STD rm "$deb" && \
 unset deb
-msg_ok "PostgreSQL установлен"
+msg_ok "pgvecto.rs установлен"
 
 # === Настройка базы данных ===
 msg_info "Настройка базы данных PostgreSQL..."
