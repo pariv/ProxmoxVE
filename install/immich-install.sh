@@ -301,7 +301,7 @@ $STD su - $IMMICH_USER -c "cp -a $INSTALL_DIR_src/LICENSE $INSTALL_DIR_app/"
 $STD su - $IMMICH_USER -c "cd $INSTALL_DIR_src/machine-learning && python3 -m venv $INSTALL_DIR_ml/venv && . $INSTALL_DIR_ml/venv/bin/activate && pip3 install poetry && poetry install --no-root --extras ${ML_ACCEL} && pip install 'numpy<2'"
 
 # Копирование ML
-$STD su - $IMMICH_USER -c "cp -a $INSTALL_DIR_src/machine-learning/ann $INSTALL_DIR_src/machine-learning/start.sh $INSTALL_DIR_src/machine-learning/app $INSTALL_DIR_ml/"
+$STD su - $IMMICH_USER -c "cp -a $INSTALL_DIR_src/machine-learning/ann $INSTALL_DIR_src/machine-learning/immich_ml $INSTALL_DIR_ml/"
 
 # Geodata
 $STD su - $IMMICH_USER -c "cd $INSTALL_DIR_geo && wget -q https://download.geonames.org/export/dump/admin1CodesASCII.txt && wget -q https://download.geonames.org/export/dump/admin2Codes.txt && wget -q https://download.geonames.org/export/dump/cities500.zip && wget -q https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_10m_admin_0_countries.geojson && unzip -o cities500.zip && rm cities500.zip && ln -s $INSTALL_DIR_geo $INSTALL_DIR_app/geodata"
