@@ -51,7 +51,7 @@ fi
 
 # === Установка системных зависимостей ===
 msg_info "Установка базовых зависимостей..."
-$STD apt install -y curl git python3-venv python3-dev build-essential unzip postgresql-common gnupg software-properties-common jq cmake autoconf pkg-config meson ninja-build libbrotli-dev libde265-dev libexif-dev libexpat1-dev libglib2.0-dev libgsf-1-dev libjpeg-turbo libjpeg-dev liblcms2-2 librsvg2-dev libspng-dev zlib1g cpanminus wget libdav1d-dev libhwy-dev libwebp-dev libio-compress-brotli-perl libtool automake libtool-bin libssl-dev libpng-dev libtiff-dev libxml2-dev liborc-0.4-0 liborc-0.4-dev
+$STD apt install -y curl git python3-venv python3-dev build-essential unzip postgresql-common gnupg software-properties-common jq cmake autoconf pkg-config meson ninja-build libbrotli-dev libde265-dev libexif-dev libexpat1-dev libglib2.0-dev libgsf-1-dev libjpeg62-turbo-dev liblcms2-2 librsvg2-dev libspng-dev zlib1g cpanminus wget libdav1d-dev libhwy-dev libwebp-dev libio-compress-brotli-perl libtool automake libtool-bin libssl-dev libpng-dev libtiff-dev libxml2-dev liborc-0.4-0 liborc-0.4-dev
 msg_ok "Базовые зависимости установлены"
 
 # === Установка PostgreSQL с pgvector ===
