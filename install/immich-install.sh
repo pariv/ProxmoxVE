@@ -298,7 +298,7 @@ $STD su - $IMMICH_USER -c "cp -a $INSTALL_DIR_src/server/start*.sh $INSTALL_DIR_
 $STD su - $IMMICH_USER -c "cp -a $INSTALL_DIR_src/LICENSE $INSTALL_DIR_app/"
 
 # Python ML
-$STD su - $IMMICH_USER -c "cd $INSTALL_DIR_src/machine-learning && python3 -m venv $INSTALL_DIR_ml/venv && . $INSTALL_DIR_ml/venv/bin/activate && pip3 install poetry && poetry install --no-root --with dev --with ${ML_ACCEL} && pip install 'numpy<2'"
+$STD su - $IMMICH_USER -c "cd $INSTALL_DIR_src/machine-learning && python3 -m venv $INSTALL_DIR_ml/venv && . $INSTALL_DIR_ml/venv/bin/activate && pip3 install poetry && poetry install --no-root --with dev --extras ${ML_ACCEL} && pip install 'numpy<2'"
 
 # Копирование ML
 $STD su - $IMMICH_USER -c "cp -a $INSTALL_DIR_src/machine-learning/ann $INSTALL_DIR_src/machine-learning/start.sh $INSTALL_DIR_src/machine-learning/app $INSTALL_DIR_ml/"
