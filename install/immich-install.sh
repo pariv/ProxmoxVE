@@ -54,11 +54,9 @@ set -e
 
 msg_info "Настройка репозиториев для совместимости с base-images..."
 
-# Расширяем репозитории
-$STD sed -i -e 's/ main/ main contrib non-free non-free-firmware/g' /etc/apt/sources.list
-if ! grep -q 'bookworm-updates' /etc/apt/sources.list; then
-  echo 'deb http://deb.debian.org/debian bookworm-updates main contrib non-free non-free-firmware testing sid' >> /etc/apt/sources.list
-fi
+# Расширяем компоненты и добавляем testing/sid в deb822-источник (debian.sources)
+$STD sed -i -e's/ main/ main contrib non-free non-free-firmware/g' /etc/apt/sources.list.d/debian.sources
+$STD sed -i -e's/ bookworm-updates/ bookworm-updates testing sid/g' /etc/apt/sources.list.d/debian.sources
 
 # Устанавливаем Pin-Priority для testing и unstable
 cat > /etc/apt/preferences.d/immich-base-images << EOL
