@@ -75,7 +75,7 @@ msg_ok "Репозитории настроены"
 # === Установка системных зависимостей ===
 msg_info "Установка базовых зависимостей..."
 $STD apt install --no-install-recommends -yqq \
-  autoconf build-essential cmake jq libbrotli-dev libde265-dev libexif-dev \
+  autoconf automake build-essential cmake jq libbrotli-dev libde265-dev libexif-dev \
   libexpat1-dev libglib2.0-dev libgsf-1-dev libjpeg62-turbo-dev liblcms2-2 \
   librsvg2-dev libspng-dev meson ninja-build pkg-config wget zlib1g cpanminus \
   libdav1d-dev libhwy-dev libwebp-dev \
@@ -186,18 +186,19 @@ SOURCE_DIR="/root/image-source"
 $STD mkdir -p "$SOURCE_DIR"
 
 # --- libheif ---
+msg_info "Сборка libheif..."
 LIBHEIF_REVISION=$(jq -cr '.revision' $BASE_IMG_REPO_DIR/server/sources/libheif.json)
 $STD git clone https://github.com/strukturag/libheif.git $SOURCE_DIR/libheif
 cd $SOURCE_DIR/libheif
 $STD git reset --hard "$LIBHEIF_REVISION"
 $STD rm -rf build && $STD mkdir build && cd build
 $STD cmake --preset=release-noplugins -DWITH_DAV1D=ON -DENABLE_PARALLEL_TILE_DECODING=ON -DWITH_LIBSHARPYUV=ON -DWITH_LIBDE265=ON -DWITH_AOM_DECODER=OFF -DWITH_AOM_ENCODER=OFF -DWITH_X265=OFF -DWITH_EXAMPLES=OFF ..
-# $STD cmake --preset=release-noplugins -DWITH_DAV1D=ON -DENABLE_PARALLEL_TILE_DECODING=ON -DWITH_LIBSHARPYUV=ON -DWITH_LIBDE265=ON -DWITH_AOM_DECODER=OFF -DWITH_AOM_ENCODER=OFF -DWITH_X265=OFF -DWITH_EXAMPLES=OFF -DCMAKE_CXX_FLAGS="-DLIBJPEG_TURBO_VERSION_NUMBER=$LIBJPEG_TURBO_VERSION_NUMBER" ..
 $STD make install -j "$(nproc)"
 $STD ldconfig /usr/local/lib
-
+msg_ok "libheif собран"
 
 # --- libjxl ---
+msg_info "Сборка libjxl..."
 LIBJXL_REVISION=$(jq -cr '.revision' $BASE_IMG_REPO_DIR/server/sources/libjxl.json)
 $STD git clone https://github.com/libjxl/libjxl.git $SOURCE_DIR/libjxl
 cd $SOURCE_DIR/libjxl
@@ -210,8 +211,10 @@ $STD cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DJPEGXL_ENABLE_DOXYGE
 $STD cmake --build . -- -j"$(nproc)"
 $STD cmake --install .
 $STD ldconfig /usr/local/lib
+msg_ok "libjxl собран"
 
 # --- libraw ---
+msg_info "Сборка libraw..."
 LIBRAW_REVISION=$(jq -cr '.revision' $BASE_IMG_REPO_DIR/server/sources/libraw.json)
 $STD git clone https://github.com/libraw/libraw.git $SOURCE_DIR/libraw
 cd $SOURCE_DIR/libraw
@@ -221,8 +224,10 @@ $STD ./configure
 $STD make -j"$(nproc)"
 $STD make install
 $STD ldconfig /usr/local/lib
+msg_ok "libraw собран"
 
 # --- imagemagick ---
+msg_info "Сборка imagemagick..."
 IMAGEMAGICK_REVISION=$(jq -cr '.revision' $BASE_IMG_REPO_DIR/server/sources/imagemagick.json)
 $STD git clone https://github.com/ImageMagick/ImageMagick.git $SOURCE_DIR/imagemagick
 cd $SOURCE_DIR/imagemagick
@@ -231,8 +236,10 @@ $STD ./configure --with-modules
 $STD make -j"$(nproc)"
 $STD make install
 $STD ldconfig /usr/local/lib
+msg_ok "imagemagick собран"
 
 # --- libvips ---
+msg_info "Сборка libvips..."
 LIBVIPS_REVISION=$(jq -cr '.revision' $BASE_IMG_REPO_DIR/server/sources/libvips.json)
 $STD git clone https://github.com/libvips/libvips.git $SOURCE_DIR/libvips
 cd $SOURCE_DIR/libvips
@@ -241,6 +248,7 @@ $STD meson setup build --buildtype=release --libdir=lib -Dintrospection=disabled
 cd build
 $STD ninja install
 $STD ldconfig /usr/local/lib
+msg_ok "libvips собран"
 
 msg_ok "Библиотеки собраны"
 
