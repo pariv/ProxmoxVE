@@ -54,30 +54,14 @@ set -e
 
 msg_info "Настройка репозиториев для совместимости с base-images..."
 
-if [ -f /etc/apt/sources.list.d/debian.sources ]; then
-  # deb822-источник (base-images, современные Debian)
-  $STD sed -i -e's/ main/ main contrib non-free non-free-firmware/g' /etc/apt/sources.list.d/debian.sources
-  $STD sed -i -e's/ bookworm-updates/ bookworm-updates testing sid/g' /etc/apt/sources.list.d/debian.sources
-else
-  # Классический sources.list (контейнеры, старые Debian)
-  $STD sed -i 's/ main/ main contrib non-free non-free-firmware/g' /etc/apt/sources.list
-  if ! grep -q '^deb .\\btesting\\b' /etc/apt/sources.list; then
-    echo 'deb http://deb.debian.org/debian testing main contrib non-free non-free-firmware' >> /etc/apt/sources.list
-  fi
-  if ! grep -q '^deb .\\bsid\\b' /etc/apt/sources.list; then
-    echo 'deb http://deb.debian.org/debian sid main contrib non-free non-free-firmware' >> /etc/apt/sources.list
-  fi
-fi
+# Для классического Debian 12: только расширяем компоненты в sources.list
+$STD sed -i 's/ main/ main contrib non-free non-free-firmware/g' /etc/apt/sources.list
 
-# Устанавливаем Pin-Priority для testing и unstable
-cat > /etc/apt/preferences.d/immich-base-images << EOL
+# Устанавливаем Pin-Priority для pgdg (опционально, чтобы pgdg был выше)
+cat > /etc/apt/preferences.d/pgdg << EOL
 Package: *
-Pin: release a=unstable
-Pin-Priority: 450
-
-Package: *
-Pin: release a=testing
-Pin-Priority: 450
+Pin: release o=apt.postgresql.org
+Pin-Priority: 600
 EOL
 
 # Добавляем репозиторий PostgreSQL
@@ -96,10 +80,6 @@ $STD apt install --no-install-recommends -yqq \
   librsvg2-dev libspng-dev meson ninja-build pkg-config wget zlib1g cpanminus \
   libdav1d-dev libhwy-dev libwebp-dev \
   curl git python3-venv python3-dev unzip gnupg software-properties-common
-
-# Устанавливаем Perl-модуль brotli из testing, как в base-images
-$STD apt install -t testing --no-install-recommends -yqq libio-compress-brotli-perl
-
 msg_ok "Базовые зависимости установлены"
 
 # === Установка PostgreSQL с pgvector и pgvecto.rs ===
