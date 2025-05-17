@@ -85,8 +85,12 @@ $STD apt install --no-install-recommends -yqq \
   autoconf build-essential cmake jq libbrotli-dev libde265-dev libexif-dev \
   libexpat1-dev libglib2.0-dev libgsf-1-dev libjpeg62-turbo-dev liblcms2-2 \
   librsvg2-dev libspng-dev meson ninja-build pkg-config wget zlib1g cpanminus \
-  libdav1d-dev libhwy-dev libwebp-dev libio-compress-brotli-perl \
+  libdav1d-dev libhwy-dev libwebp-dev \
   curl git python3-venv python3-dev unzip gnupg software-properties-common
+
+# Устанавливаем Perl-модуль brotli из testing, как в base-images
+$STD apt install -t testing --no-install-recommends -yqq libio-compress-brotli-perl
+
 msg_ok "Базовые зависимости установлены"
 
 # === Установка PostgreSQL с pgvector и pgvecto.rs ===
