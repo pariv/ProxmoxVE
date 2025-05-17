@@ -185,33 +185,6 @@ cd -
 SOURCE_DIR="/root/image-source"
 $STD mkdir -p "$SOURCE_DIR"
 
-# --- libheif ---
-LIBHEIF_REVISION=$(jq -cr '.revision' $BASE_IMG_REPO_DIR/server/sources/libheif.json)
-$STD git clone https://github.com/strukturag/libheif.git $SOURCE_DIR/libheif
-cd $SOURCE_DIR/libheif
-$STD git reset --hard "$LIBHEIF_REVISION"
-
-# Определяем версию libjpeg-turbo и преобразуем в формат XYYZZZZ
-# if dpkg -s libjpeg-turbo8-dev >/dev/null 2>&1; then
-#     LIBJPEG_TURBO_VERSION=$(dpkg-query -W -f='${Version}' libjpeg-turbo8-dev | grep -oE '^[0-9]+\\.[0-9]+\\.[0-9]+')
-#     if [ -z "$LIBJPEG_TURBO_VERSION" ]; then
-#         echo "Не удалось определить версию libjpeg-turbo8-dev!" >&2
-#         exit 1
-#     fi
-# else
-#     echo "Пакет libjpeg-turbo8-dev не установлен!" >&2
-#     exit 1
-# fi
-# IFS='.' read -r MAJOR MINOR PATCH <<< "$LIBJPEG_TURBO_VERSION"
-# LIBJPEG_TURBO_VERSION_NUMBER=$((10#$MAJOR * 1000000 + 10#$MINOR * 10000 + 10#$PATCH))
-
-$STD rm -rf build && $STD mkdir build && cd build
-$STD cmake --preset=release-noplugins -DWITH_DAV1D=ON -DENABLE_PARALLEL_TILE_DECODING=ON -DWITH_LIBSHARPYUV=ON -DWITH_LIBDE265=ON -DWITH_AOM_DECODER=OFF -DWITH_AOM_ENCODER=OFF -DWITH_X265=OFF -DWITH_EXAMPLES=OFF ..
-# $STD cmake --preset=release-noplugins -DWITH_DAV1D=ON -DENABLE_PARALLEL_TILE_DECODING=ON -DWITH_LIBSHARPYUV=ON -DWITH_LIBDE265=ON -DWITH_AOM_DECODER=OFF -DWITH_AOM_ENCODER=OFF -DWITH_X265=OFF -DWITH_EXAMPLES=OFF -DCMAKE_CXX_FLAGS="-DLIBJPEG_TURBO_VERSION_NUMBER=$LIBJPEG_TURBO_VERSION_NUMBER" ..
-$STD make install -j "$(nproc)"
-$STD ldconfig /usr/local/lib
-
-
 # --- libjxl ---
 LIBJXL_REVISION=$(jq -cr '.revision' $BASE_IMG_REPO_DIR/server/sources/libjxl.json)
 $STD git clone https://github.com/libjxl/libjxl.git $SOURCE_DIR/libjxl
@@ -221,9 +194,20 @@ $STD git submodule update --init --recursive --depth 1 --recommend-shallow
 $STD git apply $BASE_IMG_REPO_DIR/server/sources/libjxl-patches/jpegli-empty-dht-marker.patch
 $STD git apply $BASE_IMG_REPO_DIR/server/sources/libjxl-patches/jpegli-icc-warning.patch
 $STD rm -rf build && $STD mkdir build && cd build
-$STD cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DJPEGXL_ENABLE_DOXYGEN=OFF -DJPEGXL_ENABLE_MANPAGES=OFF -DJPEGXL_ENABLE_PLUGIN_GIMP210=OFF -DJPEGXL_ENABLE_BENCHMARK=OFF -DJPEGXL_ENABLE_EXAMPLES=OFF -DJPEGXL_FORCE_SYSTEM_BROTLI=ON -DJPEGXL_FORCE_SYSTEM_HWY=ON -DJPEGXL_ENABLE_JPEGLI=ON -DJPEGXL_ENABLE_JPEGLI_LIBJPEG=ON -DJPEGXL_INSTALL_JPEGLI_LIBJPEG=ON -DJPEGXL_ENABLE_PLUGINS=ON ..
+$STD cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DJPEGXL_ENABLE_DOXYGEN=OFF -DJPEGXL_ENABLE_MANPAGES=OFF -DJPEGXL_ENABLE_PLUGIN_GIMP210=OFF -DJPEGXL_ENABLE_BENCHMARK=OFF -DJPEGXL_ENABLE_EXAMPLES=OFF -DJPEGXL_FORCE_SYSTEM_BROTLI=ON -DJPEGXL_FORCE_SYSTEM_HWY=OFF -DJPEGXL_ENABLE_JPEGLI=ON -DJPEGXL_ENABLE_JPEGLI_LIBJPEG=ON -DJPEGXL_INSTALL_JPEGLI_LIBJPEG=ON -DJPEGXL_ENABLE_PLUGINS=ON ..
 $STD cmake --build . -- -j"$(nproc)"
 $STD cmake --install .
+$STD ldconfig /usr/local/lib
+
+# --- libheif ---
+LIBHEIF_REVISION=$(jq -cr '.revision' $BASE_IMG_REPO_DIR/server/sources/libheif.json)
+$STD git clone https://github.com/strukturag/libheif.git $SOURCE_DIR/libheif
+cd $SOURCE_DIR/libheif
+$STD git reset --hard "$LIBHEIF_REVISION"
+$STD rm -rf build && $STD mkdir build && cd build
+$STD cmake --preset=release-noplugins -DWITH_DAV1D=ON -DENABLE_PARALLEL_TILE_DECODING=ON -DWITH_LIBSHARPYUV=ON -DWITH_LIBDE265=ON -DWITH_AOM_DECODER=OFF -DWITH_AOM_ENCODER=OFF -DWITH_X265=OFF -DWITH_EXAMPLES=OFF ..
+# $STD cmake --preset=release-noplugins -DWITH_DAV1D=ON -DENABLE_PARALLEL_TILE_DECODING=ON -DWITH_LIBSHARPYUV=ON -DWITH_LIBDE265=ON -DWITH_AOM_DECODER=OFF -DWITH_AOM_ENCODER=OFF -DWITH_X265=OFF -DWITH_EXAMPLES=OFF -DCMAKE_CXX_FLAGS="-DLIBJPEG_TURBO_VERSION_NUMBER=$LIBJPEG_TURBO_VERSION_NUMBER" ..
+$STD make install -j "$(nproc)"
 $STD ldconfig /usr/local/lib
 
 # --- libraw ---
