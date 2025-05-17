@@ -285,9 +285,9 @@ msg_info "Установка Immich и зависимостей..."
 cd $INSTALL_DIR_src
 
 # npm (web, server, sdk)
-$STD su - $IMMICH_USER -c 'export NVM_DIR="$HOME/.nvm"; [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"; nvm use 22; cd $INSTALL_DIR_src/server && npm ci && npm run build && npm prune --omit=dev --omit=optional'
-$STD su - $IMMICH_USER -c 'export NVM_DIR="$HOME/.nvm"; [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"; nvm use 22; cd $INSTALL_DIR_src/open-api/typescript-sdk && npm ci && npm run build'
-$STD su - $IMMICH_USER -c 'export NVM_DIR="$HOME/.nvm"; [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"; nvm use 22; cd $INSTALL_DIR_src/web && npm ci && npm run build'
+$STD su - $IMMICH_USER -c "INSTALL_DIR_src='$INSTALL_DIR_src'; export NVM_DIR=\"\$HOME/.nvm\"; [ -s \"\$NVM_DIR/nvm.sh\" ] && . \"\$NVM_DIR/nvm.sh\"; nvm use 22; cd \"\$INSTALL_DIR_src/server\" && npm ci && npm run build && npm prune --omit=dev --omit=optional"
+$STD su - $IMMICH_USER -c "INSTALL_DIR_src='$INSTALL_DIR_src'; export NVM_DIR=\"\$HOME/.nvm\"; [ -s \"\$NVM_DIR/nvm.sh\" ] && . \"\$NVM_DIR/nvm.sh\"; nvm use 22; cd \"\$INSTALL_DIR_src/open-api/typescript-sdk\" && npm ci && npm run build"
+$STD su - $IMMICH_USER -c "INSTALL_DIR_src='$INSTALL_DIR_src'; export NVM_DIR=\"\$HOME/.nvm\"; [ -s \"\$NVM_DIR/nvm.sh\" ] && . \"\$NVM_DIR/nvm.sh\"; nvm use 22; cd \"\$INSTALL_DIR_src/web\" && npm ci && npm run build"
 
 # Копирование артефактов
 $STD cp -a $INSTALL_DIR_src/server/node_modules $INSTALL_DIR_src/server/dist $INSTALL_DIR_src/server/bin $INSTALL_DIR_app/
