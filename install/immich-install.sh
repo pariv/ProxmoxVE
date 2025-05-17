@@ -54,9 +54,20 @@ set -e
 
 msg_info "Настройка репозиториев для совместимости с base-images..."
 
-# Расширяем компоненты и добавляем testing/sid в deb822-источник (debian.sources)
-$STD sed -i -e's/ main/ main contrib non-free non-free-firmware/g' /etc/apt/sources.list.d/debian.sources
-$STD sed -i -e's/ bookworm-updates/ bookworm-updates testing sid/g' /etc/apt/sources.list.d/debian.sources
+if [ -f /etc/apt/sources.list.d/debian.sources ]; then
+  # deb822-источник (base-images, современные Debian)
+  $STD sed -i -e's/ main/ main contrib non-free non-free-firmware/g' /etc/apt/sources.list.d/debian.sources
+  $STD sed -i -e's/ bookworm-updates/ bookworm-updates testing sid/g' /etc/apt/sources.list.d/debian.sources
+else
+  # Классический sources.list (контейнеры, старые Debian)
+  $STD sed -i 's/ main/ main contrib non-free non-free-firmware/g' /etc/apt/sources.list
+  if ! grep -q '^deb .\\btesting\\b' /etc/apt/sources.list; then
+    echo 'deb http://deb.debian.org/debian testing main contrib non-free non-free-firmware' >> /etc/apt/sources.list
+  fi
+  if ! grep -q '^deb .\\bsid\\b' /etc/apt/sources.list; then
+    echo 'deb http://deb.debian.org/debian sid main contrib non-free non-free-firmware' >> /etc/apt/sources.list
+  fi
+fi
 
 # Устанавливаем Pin-Priority для testing и unstable
 cat > /etc/apt/preferences.d/immich-base-images << EOL
