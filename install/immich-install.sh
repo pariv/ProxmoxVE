@@ -319,15 +319,23 @@ EOF
 # systemd
 cat > /etc/systemd/system/immich-web.service << EOF
 [Unit]
-Description=Immich Web
-After=network.target
+Description=Immich Web Service
+Requires=redis-server.service
+Requires=postgresql.service
+Requires=immich-ml.service
 
 [Service]
 Type=simple
 User=$IMMICH_USER
+Group=$IMMICH_USER
+UMask=0077
 WorkingDirectory=$INSTALL_DIR_app
-ExecStart=/usr/bin/node $INSTALL_DIR_app/dist/main
+ExecStart=/bin/bash $INSTALL_DIR_app/start.sh
 Restart=on-failure
+
+SyslogIdentifier=immich-web
+StandardOutput=append:$LOG_DIR/web.log
+StandardError=append:$LOG_DIR/web.log
 
 [Install]
 WantedBy=multi-user.target
@@ -335,15 +343,21 @@ EOF
 
 cat > /etc/systemd/system/immich-ml.service << EOF
 [Unit]
-Description=Immich Machine Learning
+Description=immich machine-learning
 After=network.target
 
 [Service]
+
 Type=simple
 User=$IMMICH_USER
-WorkingDirectory=$INSTALL_DIR_ml
-ExecStart=$INSTALL_DIR_ml/venv/bin/python -m gunicorn app.main:app -k app.config.CustomUvicornWorker -w 1 -b 127.0.0.1:3003 -t 120 --log-config-json log_conf.json --graceful-timeout 0
+WorkingDirectory=$INSTALL_DIR_app
+ExecStart=$INSTALL_DIR_ml/start.sh
 Restart=on-failure
+EnvironmentFile=$IMMICH_DIR/runtime.env
+
+SyslogIdentifier=immich-machine-learning
+StandardOutput=append:$LOG_DIR/ml.log
+StandardError=append:$LOG_DIR/ml.log
 
 [Install]
 WantedBy=multi-user.target
