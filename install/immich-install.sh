@@ -204,7 +204,7 @@ msg_ok "Node.js установлен"
 # Установка зависимостей для сборки библиотек обработки изображений
 msg_info "Установка зависимостей для сборки библиотек обработки изображений..."
 if [ "$OS" = "ubuntu" ]; then
-    $STD apt DEBIAN_FRONTEND=noninteractive install --no-install-recommends -y \
+    $STD apt NEEDRESTART_MODE=a DEBIAN_FRONTEND=noninteractive install --no-install-recommends -y \
         intel-media-va-driver-non-free \
         libdav1d-dev \
         libhwy-dev \
@@ -803,6 +803,9 @@ $STD systemctl enable --now immich-web.service
 $STD systemctl enable --now immich-ml.service
 msg_ok "Services started"
 
+motd_ssh
+customize
+
 msg_info "Cleaning up"
 $STD apt-get -y autoremove
 $STD apt-get -y autoclean
@@ -816,14 +819,11 @@ $STD rm -rf /root/base-images
 
 msg_ok "Cleaned" 
 
-motd_ssh
-customize
-
 IP_ADDRESS=$(hostname -I | awk '{print $1}')
 
-echo -e "\n${DGN}=========================================${CL}"
-echo -e "${DGN}Установка Immich успешно завершена!${CL}"
-echo -e "${DGN}=========================================${CL}\n"
+echo -e "\n=========================================${CL}"
+echo -e "Установка Immich успешно завершена!${CL}"
+echo -e "=========================================${CL}\n"
 
 echo -e "Веб-интерфейс: ${BL}http://$IP_ADDRESS:2283${CL}"
 echo -e "Пароль для базы данных: ${YW}$DB_PASSWORD${CL}"
