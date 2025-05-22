@@ -28,13 +28,7 @@ INSTALL_DIR_ml="$INSTALL_DIR_app/machine-learning"
 INSTALL_DIR_geo="$INSTALL_DIR_app/geodata"
 
 # temp
-msg_info() {
-  echo "$1"
-  }
 msg_warn() {
-  echo "$1"
-  }
-msg_error() {
   echo "$1"
   }
 # === Проверка ОС ===
@@ -42,7 +36,7 @@ if [ -f /etc/os-release ]; then
     . /etc/os-release
     OS=$ID
     VERSION=$VERSION_ID
-    msg_info "Обнаружена ОС: $OS $VERSION"
+    msg_ok "Обнаружена ОС: $OS $VERSION"
 else
     msg_error "Невозможно определить версию ОС"
 fi
