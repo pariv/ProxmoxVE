@@ -31,16 +31,18 @@ function update_script() {
 }
 
 # --- Запрос опции ускорения ML ---
-if ML_ACCEL=$(whiptail --backtitle "Proxmox VE Helper Scripts" --title "Machine Learning Acceleration" --radiolist \
-  "Выберите поддержку ML-ускорения для Immich!:" 12 60 3 \
-  "cpu" "Только CPU (без ускорения)" ON \
-  "cuda" "NVIDIA CUDA (GPU)" OFF \
-  "openvino" "Intel OpenVINO (iGPU/dGPU/NPU)" OFF \
-  3>&1 1>&2 2>&3); then
-    export var_ml_accel="$ML_ACCEL"
-else
-    export var_ml_accel="cpu"
-fi
+# if ML_ACCEL=$(whiptail --backtitle "Proxmox VE Helper Scripts" --title "Machine Learning Acceleration" --radiolist \
+#   "Выберите поддержку ML-ускорения для Immich!:" 12 60 3 \
+#   "cpu" "Только CPU (без ускорения)" ON \
+#   "cuda" "NVIDIA CUDA (GPU)" OFF \
+#   "openvino" "Intel OpenVINO (iGPU/dGPU/NPU)" OFF \
+#   3>&1 1>&2 2>&3); then
+#     export var_ml_accel="$ML_ACCEL"
+# else
+#     export var_ml_accel="cpu"
+# fi
+# can't test with ml acceleration, so turn it off for now
+export var_ml_accel="cpu"
 
 start
 build_container
