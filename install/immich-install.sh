@@ -80,7 +80,6 @@ $STD apt install --no-install-recommends -y \
          libgomp1 \
          libgsf-1-114 \
          libgsf-1-dev \
-         libjpeg-dev \
          liblcms2-2 \
          liblqr-1-0 \
          libltdl7 \
@@ -205,6 +204,7 @@ if [ "$OS" = "ubuntu" ]; then
         libhwy1t64 \
         libio-compress-brotli-perl \
         libwebp-dev \
+        libjpeg-turbo8-dev \
         libwebp7 \
         libwebpdemux2 \
         libltdl-dev \
@@ -224,7 +224,7 @@ EOF
     
     # Обновление индексов
     $STD apt update
-    
+    $STD apt install --no-install-recommends -y libjpeg-dev
     # Установка пакетов из testing
     $STD apt NEEDRESTART_MODE=a DEBIAN_FRONTEND=noninteractive install -t testing --no-install-recommends -y \
         libdav1d-dev \
@@ -416,7 +416,7 @@ cd $SOURCE
 remove_build_folder $SOURCE
 
 # -Djpeg-xl=disabled is added because previous broken install will break libvips
-$STD meson setup build --buildtype=release --libdir=lib -Dintrospection=disabled -Dtiff=disabled -Djpeg-xl=disabled
+$STD meson setup build --buildtype=release --libdir=lib -Dintrospection=disabled -Dtiff=disabled
 cd build
 $STD ninja install
 ldconfig /usr/local/lib
