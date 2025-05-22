@@ -646,12 +646,12 @@ msg_ok "installed ML service"
 
 msg_info "Setting paths"
 cd $INSTALL_DIR_app
-$STD su - $IMMICH_USER -c "grep -Rl /usr/src | xargs -n1 sed -i -e \"s@/usr/src@$IMMICH_DIR@g\""
+$STD su - $IMMICH_USER -c "INSTALL_DIR='$IMMICH_DIR'; INSTALL_DIR_ml='$INSTALL_DIR_ml'; cd \"$INSTALL_DIR_app\" && grep -Rl /usr/src | xargs -n1 sed -i -e \"s@/usr/src@\$INSTALL_DIR@g\" && sed -i -e \"s@\\\"/cache\\\"@\\\"\$INSTALL_DIR/cache\\\"@g\" \"\$INSTALL_DIR_ml/immich_ml/config.py\""
+# $STD su - $IMMICH_USER -c "grep -Rl /usr/src | xargs -n1 sed -i -e \"s@/usr/src@$IMMICH_DIR@g\""
 $STD su - $IMMICH_USER -c "ln -sf $INSTALL_DIR_app/resources $IMMICH_DIR/"
 $STD su - $IMMICH_USER -c "mkdir -p $IMMICH_DIR/cache"
-#        sed -i -e "s@\"/cache\"@\"$IMMICH_DIR/cache\"@g" $IMMICH_DIR/immich_ml/config.py
-$STD su - $IMMICH_USER -c "sed -i -e 's@\"/cache\"@\"'"$IMMICH_DIR"'/cache\"@g' $INSTALL_DIR_ml/immich_ml/config.py"
-$STD su - $IMMICH_USER -c  "grep -RlE '\"/build\"|'\''/build'\'' | xargs -n1 sed -i -e 's@\"/build\"@\"$INSTALL_DIR_app\"@g' -e 's@'\''/build'\''@'\''$INSTALL_DIR_app'\''@g'"
+# $STD su - $IMMICH_USER -c "sed -i -e 's@\"/cache\"@\"'"$IMMICH_DIR"'/cache\"@g' $INSTALL_DIR_ml/immich_ml/config.py"
+$STD su - $IMMICH_USER -c "INSTALL_DIR_app='$INSTALL_DIR_app'; cd \"\$INSTALL_DIR_app\" && grep -RlE '\"/build\"|'\''/build'\'''"' | xargs -n1 sed -i -e "s@\"/build\"@\"$INSTALL_DIR_app\"@g" -e "s@'\''/build'\''@'\''$INSTALL_DIR_app'\''@g"'
 msg_ok "Set paths"
 
 msg_info "Installing sharp and CLI"
