@@ -198,7 +198,7 @@ msg_ok "Node.js установлен"
 # Установка зависимостей для сборки библиотек обработки изображений
 msg_info "Установка зависимостей для сборки библиотек обработки изображений..."
 if [ "$OS" = "ubuntu" ]; then
-    $STD apt NEEDRESTART_MODE=a DEBIAN_FRONTEND=noninteractive install --no-install-recommends -y \
+    $STD apt install --no-install-recommends -y \
         intel-media-va-driver-non-free \
         libdav1d-dev \
         libhwy-dev \
@@ -226,7 +226,7 @@ EOF
     $STD apt update
     
     # Установка пакетов из testing
-    $STD apt install -t testing --no-install-recommends -y \
+    $STD apt NEEDRESTART_MODE=a DEBIAN_FRONTEND=noninteractive install -t testing --no-install-recommends -y \
         libdav1d-dev \
         libhwy-dev \
         libhwy1t64 \
