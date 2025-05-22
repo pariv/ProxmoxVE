@@ -193,7 +193,7 @@ $STD chown -R $IMMICH_USER:$IMMICH_USER $IMMICH_DIR
 msg_ok "Пользователь Immich создан"
 
 run_with_nvm() {
-  su - $IMMICH_USER -c "export NVM_DIR=\"\$HOME/.nvm\" && [ -s \"\$NVM_DIR/nvm.sh\" ] && . \"\$NVM_DIR/nvm.sh\" && nvm use 22 && $1"
+  $STD su - $IMMICH_USER -c "export NVM_DIR=\"\$HOME/.nvm\" && [ -s \"\$NVM_DIR/nvm.sh\" ] && . \"\$NVM_DIR/nvm.sh\" && nvm use 22 && $1"
 }
 # Установка Node.js через nvm для пользователя Immich
 msg_info "Установка Node.js для пользователя Immich..."
@@ -204,7 +204,7 @@ msg_ok "Node.js установлен"
 # Установка зависимостей для сборки библиотек обработки изображений
 msg_info "Установка зависимостей для сборки библиотек обработки изображений..."
 if [ "$OS" = "ubuntu" ]; then
-    apt install --no-install-recommends -y \
+    $STD apt DEBIAN_FRONTEND=noninteractive install --no-install-recommends -y \
         intel-media-va-driver-non-free \
         libdav1d-dev \
         libhwy-dev \
@@ -229,10 +229,10 @@ Pin-Priority: -10
 EOF
     
     # Обновление индексов
-    apt update
+    $STD apt update
     
     # Установка пакетов из testing
-    apt install -t testing --no-install-recommends -y \
+    $STD apt install -t testing --no-install-recommends -y \
         libdav1d-dev \
         libhwy-dev \
         libhwy1t64 \
@@ -264,22 +264,22 @@ $STD mkdir -p "$SOURCE_DIR"
 LD_LIBRARY_PATH=/usr/local/lib # :$LD_LIBRARY_PATH
 LD_RUN_PATH=/usr/local/lib # :$LD_RUN_PATH
 sed -i 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
-locale-gen
+$STD locale-gen
 
 function git_clone () {
     # $1 is repo URL
     # $2 is clone target folder
     # $3 is branch name
     if [ ! -d "$2" ]; then
-        git clone "$1" "$2"
+        $STD git clone "$1" "$2"
     fi
     cd $2
     # Get updates
-    git fetch
+    $STD git fetch
     # REMOVE all the change one made to source repo, which is sth not supposed to happen
-    git reset FETCH_HEAD --hard
+    $STD git reset FETCH_HEAD --hard
     # In case one is not on the branch
-    git reset --hard "$3"
+    $STD git reset --hard "$3"
 }
 function remove_build_folder () {
     cd $1
@@ -303,16 +303,16 @@ LIBJXL_REVISION=$(jq -cr '.revision' $BASE_IMG_REPO_DIR/server/sources/libjxl.js
 set +e
 
 git_clone https://github.com/libjxl/libjxl.git $SOURCE $LIBJXL_REVISION
-git submodule update --init --recursive --depth 1 --recommend-shallow
+$STD git submodule update --init --recursive --depth 1 --recommend-shallow
 
-git apply $BASE_IMG_REPO_DIR/server/sources/libjxl-patches/jpegli-empty-dht-marker.patch
-git apply $BASE_IMG_REPO_DIR/server/sources/libjxl-patches/jpegli-icc-warning.patch
+$STD git apply $BASE_IMG_REPO_DIR/server/sources/libjxl-patches/jpegli-empty-dht-marker.patch
+$STD git apply $BASE_IMG_REPO_DIR/server/sources/libjxl-patches/jpegli-icc-warning.patch
 
 remove_build_folder $SOURCE
 
 mkdir build
 cd build
-cmake \
+$STD cmake \
 -DCMAKE_BUILD_TYPE=Release \
 -DBUILD_TESTING=OFF \
 -DJPEGXL_ENABLE_DOXYGEN=OFF \
@@ -333,14 +333,14 @@ cmake \
 # Move the following flag to above if one's system support AVX512
 # -DJPEGXL_ENABLE_AVX512=ON \
 # -DJPEGXL_ENABLE_AVX512_ZEN4=ON \
-echo "Building libjxl using $(nproc) threads"
-cmake --build . -- -j"$(nproc)"
-cmake --install .
+$STD echo "Building libjxl using $(nproc) threads"
+$STD cmake --build . -- -j"$(nproc)"
+$STD cmake --install .
 
-ldconfig /usr/local/lib
+$STD ldconfig /usr/local/lib
 
 # Clean up builds
-make clean
+$STD make clean
 remove_build_folder $SOURCE
 rm -rf $SOURCE/third_party/
 msg_ok "libjxl собран"
@@ -348,7 +348,7 @@ msg_ok "libjxl собран"
 
 # --- libheif ---
 msg_info "Сборка libheif..."
-cd $SCRIPT_DIR
+#cd $SCRIPT_DIR
 SOURCE=$SOURCE_DIR/libheif
 LIBHEIF_REVISION=$(jq -cr '.revision' $BASE_IMG_REPO_DIR/server/sources/libheif.json)
 git_clone https://github.com/strukturag/libheif.git $SOURCE $LIBHEIF_REVISION
@@ -356,7 +356,7 @@ cd $SOURCE
 remove_build_folder $SOURCE
 mkdir build
 cd build
-cmake --preset=release-noplugins \
+$STD cmake --preset=release-noplugins \
     -DWITH_DAV1D=ON \
     -DENABLE_PARALLEL_TILE_DECODING=ON \
     -DWITH_LIBSHARPYUV=ON \
@@ -366,55 +366,55 @@ cmake --preset=release-noplugins \
     -DWITH_X265=OFF \
     -DWITH_EXAMPLES=OFF \
     ..
-make install -j "$(nproc)"
+$STD make install -j "$(nproc)"
 ldconfig /usr/local/lib
 # Clean up builds
-make clean
+$STD make clean
 remove_build_folder $SOURCE
 msg_ok "libheif собран"
 
 # --- libraw ---
 msg_info "Сборка libraw..."
-cd $SCRIPT_DIR
+#cd $SCRIPT_DIR
 SOURCE=$SOURCE_DIR/libraw
 LIBRAW_REVISION=$(jq -cr '.revision' $BASE_IMG_REPO_DIR/server/sources/libraw.json)
 git_clone https://github.com/libraw/libraw.git $SOURCE $LIBRAW_REVISION
 
 cd $SOURCE
 
-autoreconf --install
-./configure
-echo "Building libraw using $(nproc) threads"
-make -j"$(nproc)"
-make install
+$STD autoreconf --install
+$STD ./configure
+$STD echo "Building libraw using $(nproc) threads"
+$STD make -j"$(nproc)"
+$STD make install
 ldconfig /usr/local/lib
 
 # Clean up builds
-make clean
+$STD make clean
 msg_ok "libraw собран"
 
 
 # --- imagemagick ---
 msg_info "Сборка imagemagick..."
-cd $SCRIPT_DIR
+#cd $SCRIPT_DIR
 SOURCE=$SOURCE_DIR/image-magick
 IMAGEMAGICK_REVISION=$(jq -cr '.revision' $BASE_IMG_REPO_DIR/server/sources/imagemagick.json)
 git_clone https://github.com/ImageMagick/ImageMagick.git $SOURCE $IMAGEMAGICK_REVISION
 cd $SOURCE
 
-./configure --with-modules
-echo "Building ImageMagick using $(nproc) threads"
-make -j"$(nproc)"
-make install
+$STD ./configure --with-modules
+$STD echo "Building ImageMagick using $(nproc) threads"
+$STD make -j"$(nproc)"
+$STD make install
 ldconfig /usr/local/lib
 
 # Clean up builds
-make clean
+$STD make clean
 msg_ok "imagemagick собран"
 
 # --- libvips ---
 msg_info "Сборка libvips..."
-cd $SCRIPT_DIR
+#cd $SCRIPT_DIR
 SOURCE=$SOURCE_DIR/libvips
 LIBVIPS_REVISION=$(jq -cr '.revision' $BASE_IMG_REPO_DIR/server/sources/libvips.json)
 git_clone https://github.com/libvips/libvips.git $SOURCE $LIBVIPS_REVISION
@@ -422,9 +422,9 @@ cd $SOURCE
 remove_build_folder $SOURCE
 
 # -Djpeg-xl=disabled is added because previous broken install will break libvips
-meson setup build --buildtype=release --libdir=lib -Dintrospection=disabled -Dtiff=disabled -Djpeg-xl=disabled
+$STD meson setup build --buildtype=release --libdir=lib -Dintrospection=disabled -Dtiff=disabled -Djpeg-xl=disabled
 cd build
-ninja install
+$STD ninja install
 ldconfig /usr/local/lib
 
 # Clean up builds
