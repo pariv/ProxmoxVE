@@ -19,7 +19,7 @@ IMMICH_USER="immich"
 IMMICH_DIR="/home/$IMMICH_USER"
 UPLOAD_DIR="$IMMICH_DIR/upload"
 LOG_DIR="/var/log/immich"
-IMMICH_REPO_TAG="v1.132.3"
+IMMICH_REPO_TAG="v1.133.0"
 DB_PASSWORD="$(openssl rand -base64 24 | tr -dc 'a-zA-Z0-9')"
 REPO_URL="https://github.com/immich-app/immich"
 INSTALL_DIR_src="$IMMICH_DIR/source"
@@ -112,13 +112,13 @@ $STD apt install --no-install-recommends -y \
 msg_ok "Базовые зависимости установлены"
 
 # Установка PostgreSQL с pgvector
-msg_info "Установка PostgreSQL с расширением pgvecto.rs..."
+msg_info "Установка PostgreSQL с расширением VectorChord..."
 $STD apt install -y postgresql-common
 $STD /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
 $STD apt install -y postgresql-17 postgresql-17-pgvector
 # $STD deb=$(curl -w "%{filename_effective}" -LO https://github.com/tensorchord/pgvecto.rs/releases/download/v0.4.0/vectors-pg17_0.4.0_amd64.deb) && dpkg -i $deb && rm $deb && unset deb
-deb=$(basename https://github.com/tensorchord/pgvecto.rs/releases/download/v0.4.0/vectors-pg17_0.4.0_amd64.deb) && \
-$STD curl -LO "https://github.com/tensorchord/pgvecto.rs/releases/download/v0.4.0/$deb" && \
+deb=$(basename https://github.com/tensorchord/VectorChord/releases/download/0.3.0/postgresql-17-vchord_0.3.0-1_$(dpkg --print-architecture).deb) && \
+$STD curl -LO "https://github.com/tensorchord/VectorChord/releases/download/0.3.0/$deb" && \
 $STD dpkg -i "$deb" && \
 $STD rm "$deb" && \
 unset deb
@@ -126,7 +126,7 @@ msg_ok "PostgreSQL установлен"
 
 # Настройка базы данных
 msg_info "Настройка базы данных PostgreSQL..."
-$STD sudo -u postgres psql -c 'ALTER SYSTEM SET shared_preload_libraries = "vectors.so"'
+$STD sudo -u postgres psql -c 'ALTER SYSTEM SET shared_preload_libraries = "vchord.so"'
 $STD sudo -u postgres psql -c 'ALTER SYSTEM SET search_path TO "$user", public, vectors'
 $STD sudo -u postgres psql -c "CREATE DATABASE immich;"
 $STD sudo -u postgres psql -c "CREATE USER immich WITH ENCRYPTED PASSWORD '$DB_PASSWORD';"
